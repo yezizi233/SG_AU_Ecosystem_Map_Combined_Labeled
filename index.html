@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>新加坡 + 澳大利亚 生物医药生态系统地图（合并版 | A/B/C + D现有客户）</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { width: 100vw; height: 100vh; }
+        .legend { background: white; padding: 10px; line-height: 1.5; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
+        .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; border-radius: 50%; }
+        .note { position: absolute; top: 10px; left: 10px; z-index: 1000; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 6px; max-width: 430px; box-shadow: 0 0 15px rgba(0,0,0,0.2); font-size: 13px; line-height: 1.4; }
+        .note b { display:block; margin-bottom: 4px; }
+
+        /* Permanent label styling (Leaflet tooltip + custom className) */
+        .leaflet-tooltip.marker-label {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(0,0,0,0.25);
+            border-radius: 4px;
+            color: #111;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .leaflet-tooltip-top.marker-label:before {
+            border-top-color: rgba(0,0,0,0.25);
+        }
+        .leaflet-tooltip-right.marker-label:before {
+            border-right-color: rgba(0,0,0,0.25);
+        }
+        .leaflet-tooltip-left.marker-label:before {
+            border-left-color: rgba(0,0,0,0.25);
+        }
+        .leaflet-tooltip-bottom.marker-label:before {
+            border-bottom-color: rgba(0,0,0,0.25);
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="note">
+      <b>使用说明</b>
+1) 所有点位名称已默认常驻显示（无需点击）。若文字重叠，请放大/缩小或移动地图。<br/>
+2) 点击圆点可查看详情（分类、地址/位置、以及部分点位的补充信息）。<br/>
+3) D 类为澳洲现有客户（截图中 &gt;1Mn RMB Account 的 SO/RFQ）。<br/>
+4) 图钉位置用于生态/差旅规划；Popup 内提供可公开的精确地址与 Google Maps 跳转（如有）。
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map', {
+            worldCopyJump: true
+        }).setView([-15, 125], 3);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://carto.com/">CartoDB</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        var data = [{"section": "A. 核心研发园区", "category": "研发园区", "name": "Biopolis（启奥城）", "location": "one-north, Buona Vista", "coords": [1.3023, 103.7915], "color": "red", "country": "Singapore", "group": "A", "address": "one-north, Buona Vista"}, {"section": "A. 核心研发园区", "category": "研发园区", "name": "Geneo @ Singapore Science Park", "location": "Science Park Drive, Kent Ridge", "coords": [1.2917, 103.7828], "color": "red", "country": "Singapore", "group": "A", "address": "Science Park Drive, Kent Ridge"}, {"section": "A. 核心研发园区", "category": "研发园区", "name": "Tuas Biomedical Park", "location": "Tuas, 西部", "coords": [1.2952, 103.6262], "color": "red", "country": "Singapore", "group": "A", "address": "Tuas, 西部"}, {"section": "A. 核心研发园区", "category": "研发园区", "name": "Kallang Life Sciences Sub-cluster", "location": "Kallang, 城市边缘", "coords": [1.3113, 103.8649], "color": "red", "country": "Singapore", "group": "A", "address": "Kallang, 城市边缘"}, {"section": "A. 核心研发园区", "category": "研发园区", "name": "LaunchPad @ one-north", "location": "one-north", "coords": [1.2965, 103.7884], "color": "red", "country": "Singapore", "group": "A", "address": "one-north"}, {"section": "B. 生物医药孵化器/加速器", "category": "孵化器", "name": "NSG BioLabs", "location": "Biopolis内，3个站点", "coords": [1.3033, 103.791], "color": "blue", "country": "Singapore", "group": "B", "address": "Biopolis内，3个站点"}, {"section": "B. 生物医药孵化器/加速器", "category": "孵化器", "name": "JLABS Singapore (J&J Innovation)", "location": "Biopolis/one-north", "coords": [1.303, 103.7925], "color": "blue", "country": "Singapore", "group": "B", "address": "Biopolis/one-north"}, {"section": "B. 生物医药孵化器/加速器", "category": "孵化器", "name": "CO11AB (NHG BioMedTech Incubator)", "location": "Health City Novena", "coords": [1.3216, 103.8458], "color": "blue", "country": "Singapore", "group": "B", "address": "Health City Novena"}, {"section": "B. 生物医药孵化器/加速器", "category": "孵化器", "name": "SGInnovate", "location": "Carpenter Street, Clarke Quay", "coords": [1.2873, 103.8471], "color": "blue", "country": "Singapore", "group": "B", "address": "Carpenter Street, Clarke Quay"}, {"section": "B. 生物医药孵化器/加速器", "category": "加速器", "name": "Antler Singapore", "location": "128 Prinsep Street, Bugis", "coords": [1.3005, 103.852], "color": "blue", "country": "Singapore", "group": "B", "address": "128 Prinsep Street, Bugis"}, {"section": "C. 生命科学核心投资机构", "category": "投资机构", "name": "ClavystBio (Temasek)", "location": "Node 1, Singapore Science Park", "coords": [1.292, 103.783], "color": "green", "country": "Singapore", "group": "C", "address": "Node 1, Singapore Science Park"}, {"section": "C. 生命科学核心投资机构", "category": "投资机构", "name": "SG Growth Capital (EDBI+Seeds合并)", "location": "Singapore", "coords": [1.2941, 103.8528], "color": "green", "country": "Singapore", "group": "C", "address": "Singapore"}, {"section": "C. 生命科学核心投资机构", "category": "投资机构", "name": "Nest.Bio Ventures / NSG Ventures", "location": "Singapore/Boston", "coords": [1.3028, 103.7905], "color": "green", "country": "Singapore", "group": "C", "address": "Singapore/Boston"}, {"section": "C. 生命科学核心投资机构", "category": "投资机构", "name": "Xora Innovation (Temasek)", "location": "Symbiosis Tower, One North", "coords": [1.299, 103.789], "color": "green", "country": "Singapore", "group": "C", "address": "Symbiosis Tower, One North"}, {"section": "A. 研发园区", "category": "研发园区", "name": "Parkville Biomedical Precinct (Melbourne Biomedical Precinct)", "address": "Parkville, Melbourne VIC", "coords": [-37.799, 144.957], "color": "red", "extra": {"类型/定位": "澳洲首屈一指的生物医药研发枢纽", "核心能力/服务": "30+世界级医院、研究所和大学；CSL全球总部；Jumar Bioincubator（40+初创容量）；WEHI、Peter MacCallum Cancer Centre、Royal Melbourne Hospital"}, "country": "Australia", "group": "A", "location": "Parkville, Melbourne VIC"}, {"section": "A. 研发园区", "category": "研发园区", "name": "Monash Precinct (Clayton/Parkville)", "address": "Clayton/Parkville, Melbourne VIC", "coords": [-37.91, 145.134], "color": "red", "extra": {"类型/定位": "大学驱动的药物研发中心", "核心能力/服务": "Monash Institute of Pharmaceutical Sciences (MIPS)；Neuromedicines Discovery Centre (NDC)；药物化学、药理学、DMPK平台"}, "country": "Australia", "group": "A", "location": "Clayton/Parkville, Melbourne VIC"}, {"section": "A. 研发园区", "category": "研发园区", "name": "Sydney Biomedical Precinct (Westmead/Macquarie Park)", "address": "Western Sydney & Macquarie Park, NSW", "coords": [-33.803, 150.987], "color": "red", "extra": {"类型/定位": "临床试验与转化研究中心", "核心能力/服务": "Westmead Hospital (最大医学研究园区之一)；Macquarie大学/公园企业区；Cicada Innovations Sydney总部"}, "country": "Australia", "group": "A", "location": "Western Sydney & Macquarie Park, NSW"}, {"section": "A. 研发园区", "category": "研发园区", "name": "Translational Research Institute (TRI) Brisbane", "address": "Woolloongabba, Brisbane QLD", "coords": [-27.487, 153.027], "color": "red", "extra": {"类型/定位": "转化研究枢纽", "核心能力/服务": "Princess Alexandra Hospital旁；UQ/QUT/Mater Research合作；临床试验设施；350+研究人员"}, "country": "Australia", "group": "A", "location": "Woolloongabba, Brisbane QLD"}, {"section": "A. 研发园区", "category": "研发园区", "name": "Harry Perkins Institute of Medical Research", "address": "Nedlands, Perth WA", "coords": [-31.98, 115.816], "color": "red", "extra": {"类型/定位": "Western Australia核心医学研究所", "核心能力/服务": "QEII医疗中心旁；聚焦癌症、心血管、遗传病研究；PYC Therapeutics起源于此生态"}, "country": "Australia", "group": "A", "location": "Nedlands, Perth WA"}, {"section": "B. 孵化器/加速器", "category": "孵化器", "name": "Jumar Bioincubator", "address": "Parkville, Melbourne VIC (CSL新总部内)", "coords": [-37.799, 144.957], "color": "blue", "extra": {"类型/定位": "澳洲首个与大型制药企业共址的生物技术孵化器", "核心能力/服务": "$9500万投资；CSL/WEHI/墨尔本大学/Breakthrough Victoria合作；30+初创容量；BSL-2湿实验室；Cicada Innovations运营"}, "country": "Australia", "group": "B", "location": "Parkville, Melbourne VIC (CSL新总部内)"}, {"section": "B. 孵化器/加速器", "category": "孵化器", "name": "Cicada Innovations", "address": "Sydney (Eveleigh) + Melbourne (Jumar运营)", "coords": [-33.892, 151.193], "color": "blue", "extra": {"类型/定位": "澳洲顶级深度科技孵化器 （两次全球最佳孵化器）", "核心能力/服务": "400+初创孵化；$6.1B融资成果；覆盖Biotech/MedTech/Clean Energy；提供实验室、导师、投资者网络"}, "country": "Australia", "group": "B", "location": "Sydney (Eveleigh) + Melbourne (Jumar运营)"}, {"section": "B. 孵化器/加速器", "category": "加速器", "name": "Brandon BioCatalyst (CUREator Programme)", "address": "National (Melbourne base)", "coords": [-37.8136, 144.9631], "color": "blue", "extra": {"类型/定位": "澳洲最大的生命科学投资孵化平台", "核心能力/服务": "MRFF $4000万CUREator项目；管理早期临床前和临床阶段商业化；已支持Phrenix等公司"}, "country": "Australia", "group": "B", "location": "National (Melbourne base)"}, {"section": "B. 孵化器/加速器", "category": "加速器", "name": "BridgeLab (Melbourne/Sydney)", "address": "Melbourne/Sydney", "coords": [-33.8688, 151.2093], "color": "blue", "extra": {"类型/定位": "生命科学加速器", "核心能力/服务": "连接科研与商业化；提供资金、导师和行业网络；覆盖Biotech/MedTech"}, "country": "Australia", "group": "B", "location": "Melbourne/Sydney"}, {"section": "B. 孵化器/加速器", "category": "加速器", "name": "iLab Accelerator (UQ)", "address": "Brisbane QLD", "coords": [-27.4698, 153.0251], "color": "blue", "extra": {"类型/定位": "UQ大学创业加速器", "核心能力/服务": "昆士兰大学运营；支持深度科技和生命科学创业公司"}, "country": "Australia", "group": "B", "location": "Brisbane QLD"}, {"section": "C. 投资机构", "category": "投资机构", "name": "Brandon Capital Partners", "address": "Melbourne/Sydney/US/UK", "coords": [-33.8688, 151.2093], "color": "green", "extra": {"类型/定位": "澳洲最大生命科学VC", "核心能力/服务": "管理多支基金；专注生命科学早期到成长阶段投资；CUREator管理方；已投Phrenix等"}, "country": "Australia", "group": "C", "location": "Melbourne/Sydney/US/UK"}, {"section": "C. 投资机构", "category": "投资机构", "name": "Breakthrough Victoria", "address": "Melbourne VIC", "coords": [-37.8136, 144.9631], "color": "green", "extra": {"类型/定位": "维州$20亿创新投资基金", "核心能力/服务": "政府背景；Jumar Bioincubator核心出资方；聚焦健康生命科学、清洁能源、先进制造"}, "country": "Australia", "group": "C", "location": "Melbourne VIC"}, {"section": "C. 投资机构", "category": "投资机构", "name": "OneVentures", "address": "Sydney NSW", "coords": [-33.8688, 151.2093], "color": "green", "extra": {"类型/定位": "澳洲医疗科技VC", "核心能力/服务": "专注Health Tech和Life Sciences投资；多轮基金管理"}, "country": "Australia", "group": "C", "location": "Sydney NSW"}, {"section": "C. 投资机构", "category": "投资机构", "name": "Medical Research Future Fund (MRFF)", "address": "National", "coords": [-25.2744, 133.7751], "color": "green", "extra": {"类型/定位": "联邦政府$200亿+医学研究基金", "核心能力/服务": "支持临床试验基础设施、商业化（如CUREator）、大型研究项目"}, "country": "Australia", "group": "C", "location": "National"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "PYC Therapeutics", "address": "Harry Perkins Institute of Medical Research, 6 Verdun Street, Nedlands WA 6009, Australia", "coords": [-31.98, 115.816], "color": "orange", "extra": {"Status": "SO & RFQ"}, "country": "Australia", "group": "D", "location": "Harry Perkins Institute of Medical Research, 6 Verdun Street, Nedlands WA 6009, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "ONE30 Therapeutics Pty Ltd", "address": "Carlton VIC 3053, Australia (Main business location per ABN record)", "coords": [-37.8, 144.964], "color": "orange", "extra": {"Status": "SO & RFQ"}, "country": "Australia", "group": "D", "location": "Carlton VIC 3053, Australia (Main business location per ABN record)"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "Phrenix Therapeutics Pty Ltd", "address": "34 Exhibition Walk, Clayton VIC 3168, Australia", "coords": [-37.91, 145.134], "color": "orange", "extra": {"Status": "SO & RFQ"}, "country": "Australia", "group": "D", "location": "34 Exhibition Walk, Clayton VIC 3168, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "Bright Minds Biosciences (AU entity)", "address": "Richmond VIC 3066, Australia (Main business location per ABN record)", "coords": [-37.824, 145.001], "color": "orange", "extra": {"Status": "SO & RFQ"}, "country": "Australia", "group": "D", "location": "Richmond VIC 3066, Australia (Main business location per ABN record)"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "Terran Biosciences Inc. (AU entity)", "address": "Adelaide SA 5000, Australia (Main business location per ABN record)", "coords": [-34.9285, 138.6007], "color": "orange", "extra": {"Status": "SO & RFQ"}, "country": "Australia", "group": "D", "location": "Adelaide SA 5000, Australia (Main business location per ABN record)"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "Gertrude Biomedical", "address": "Level 6, 12-20 Flinders Lane, Melbourne VIC 3000, Australia", "coords": [-37.8136, 144.9631], "color": "orange", "extra": {"Status": "SO & RFQ"}, "country": "Australia", "group": "D", "location": "Level 6, 12-20 Flinders Lane, Melbourne VIC 3000, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "exteRNA", "address": "Jumar Bioincubator, Level 11, 655 Elizabeth Street, Melbourne VIC 3000, Australia", "coords": [-37.807, 144.957], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "Jumar Bioincubator, Level 11, 655 Elizabeth Street, Melbourne VIC 3000, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "Sonic Clinical Trials Pty Ltd", "address": "14 Giffnock Avenue, Macquarie Park, Sydney NSW 2113, Australia", "coords": [-33.776, 151.12], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "14 Giffnock Avenue, Macquarie Park, Sydney NSW 2113, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "Gallant Bio", "address": "Jumar Bioincubator, Level 11, 655 Elizabeth Street, Melbourne VIC 3000, Australia", "coords": [-37.807, 144.957], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "Jumar Bioincubator, Level 11, 655 Elizabeth Street, Melbourne VIC 3000, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "ProGenis Pharmaceuticals", "address": "3 Brodie-Hall Dr, Suite 7 & 10, Bentley WA 6102, Australia", "coords": [-32.005, 115.894], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "3 Brodie-Hall Dr, Suite 7 & 10, Bentley WA 6102, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "AMTBio Pty Ltd", "address": "Clayton VIC 3168, Australia (Public info does not disclose street address; using Hudson Institute precinct address 27–31 Wright Street, Clayton VIC 3168 as reference point)", "coords": [-37.91, 145.134], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "Clayton VIC 3168, Australia (Public info does not disclose street address; using Hudson Institute precinct address 27–31 Wright Street, Clayton VIC 3168 as reference point)"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "Noxopharm Limited", "address": "Suite 71, 159 Ridgecrop Drive, Castle Hill NSW 2154, Australia", "coords": [-33.734, 151.003], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "Suite 71, 159 Ridgecrop Drive, Castle Hill NSW 2154, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "University of Adelaide", "address": "North Terrace, Adelaide SA 5005, Australia", "coords": [-34.9285, 138.6007], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "North Terrace, Adelaide SA 5005, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "Valley Biosciences Pty Ltd", "address": "81-83 Campbell Street, Surry Hills NSW 2010, Australia", "coords": [-33.888, 151.214], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "81-83 Campbell Street, Surry Hills NSW 2010, Australia"}, {"section": "D. 现有客户（>1Mn RMB Account）", "category": "现有客户", "name": "UniQuest (UQ Commercialisation)", "address": "Level 7, General Purpose South Building (Building #78), Staff House Road, The University of Queensland, St Lucia QLD, Australia", "coords": [-27.4975, 153.0137], "color": "orange", "extra": {"Status": "RFQ"}, "country": "Australia", "group": "D", "location": "Level 7, General Purpose South Building (Building #78), Staff House Road, The University of Queensland, St Lucia QLD, Australia"}];
+
+        var colorMap = {
+            'red': '#E41A1C',
+            'blue': '#377EB8',
+            'green': '#4DAF4A',
+            'orange': '#FF7F00'
+        };
+
+        var layers = {};
+        layers['A'] = L.layerGroup().addTo(map);
+        layers['B'] = L.layerGroup().addTo(map);
+        layers['C'] = L.layerGroup().addTo(map);
+        layers['D'] = L.layerGroup().addTo(map);
+
+        function buildPopup(item) {
+            var html = "<b>" + item.name + "</b><br/>" +
+                       "<b>国家/地区:</b> " + (item.country || "") + "<br/>" +
+                       "<b>分类:</b> " + (item.section || "") + "（" + (item.category || "") + "）<br/>" +
+                       "<b>地址/位置:</b> " + (item.address || item.location || "") + "<br/>";
+
+            if (item.extra) {
+                if (item.extra['Status']) {
+                    html += "<b>Status:</b> " + item.extra['Status'] + "<br/>";
+                }
+                if (item.extra['类型/定位']) {
+                    html += "<b>类型/定位:</b> " + item.extra['类型/定位'] + "<br/>";
+                }
+                if (item.extra['核心能力/服务']) {
+                    html += "<b>核心能力/服务:</b> " + item.extra['核心能力/服务'] + "<br/>";
+                }
+            }
+
+            if (item.address) {
+                var gmap = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(item.address);
+                html += "<a href='" + gmap + "' target='_blank'>打开 Google Maps</a>";
+            }
+            return html;
+        }
+
+        var labelCountByCoord = {};
+        function tooltipOffset(coords) {
+            var key = coords[0].toFixed(6) + "," + coords[1].toFixed(6);
+            var idx = labelCountByCoord[key] || 0;
+            labelCountByCoord[key] = idx + 1;
+
+            if (idx === 0) return [10, 0];
+            var row = Math.ceil(idx / 2);
+            var y = (idx % 2 === 1) ? row * 14 : -row * 14;
+            return [10, y];
+        }
+
+        var allLatLngs = [];
+
+        data.forEach(function(item) {
+            var markerColor = colorMap[item.color] || '#666';
+            var targetLayer = layers[item.group] || map;
+
+            var circleMarker = L.circleMarker(item.coords, {
+                radius: (item.group === 'D') ? 9 : 8,
+                fillColor: markerColor,
+                color: '#fff',
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.85
+            }).addTo(targetLayer);
+
+            circleMarker.bindPopup(buildPopup(item));
+
+            circleMarker.bindTooltip(item.name, {
+                permanent: true,
+                direction: 'auto',
+                opacity: 0.95,
+                className: 'marker-label',
+                offset: tooltipOffset(item.coords)
+            }).openTooltip();
+
+            allLatLngs.push(item.coords);
+        });
+
+        if (allLatLngs.length > 0) { var bounds = L.latLngBounds(allLatLngs); map.fitBounds(bounds.pad(0.15)); }
+
+        L.control.layers(null, {
+            'A. 研发园区': layers['A'],
+            'B. 孵化器/加速器': layers['B'],
+            'C. 投资机构': layers['C'],
+            'D. 现有客户': layers['D']
+        }, {collapsed: false}).addTo(map);
+
+
+        var legend = L.control({position: 'bottomright'});
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'info legend');
+            div.innerHTML += '<b>图例</b><br>';
+            div.innerHTML += '<i style="background: #E41A1C"></i> A. 研发园区<br>';
+            div.innerHTML += '<i style="background: #377EB8"></i> B. 孵化器/加速器<br>';
+            div.innerHTML += '<i style="background: #4DAF4A"></i> C. 投资机构<br>';
+            div.innerHTML += '<i style="background: #FF7F00"></i> D. 现有客户<br>';
+            return div;
+        };
+        legend.addTo(map);
+
+    </script>
+</body>
+</html>
